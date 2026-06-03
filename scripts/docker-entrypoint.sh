@@ -35,8 +35,9 @@ for key in optional_string_keys:
 if os.environ.get("MAIL_PORT"):
     config["MAIL_PORT"] = int(os.environ["MAIL_PORT"])
 
-if os.environ.get("SENTRY_ENABLED"):
-    config["SENTRY_ENABLED"] = os.environ["SENTRY_ENABLED"].lower() in ("1", "true", "yes", "on")
+for key in ["SENTRY_ENABLED", "MAIL_SUPPRESS_SEND"]:
+    if os.environ.get(key):
+        config[key] = os.environ[key].lower() in ("1", "true", "yes", "on")
 
 Path("config").mkdir(exist_ok=True)
 Path("config/prod.json").write_text(json.dumps(config, indent=4))
