@@ -43,6 +43,11 @@ def _send_reset_email(id, email, username, hashed, url_root):
 
     msg.body = f"Hello {username},\n\n You are receiving this email because we received a request to reset your password. If this wasn't you, you can ignore this email. Otherwise, please follow this link: {link}"
     msg.html = render_template('emails/reset.html', user=username, link=link)
+
+    if current_app.config.get("MAIL_SUPPRESS_SEND"):
+        current_app.logger.warning("MAIL_SUPPRESS_SEND enabled; password reset link for %s: %s", email, link)
+        return
+
     mail.send(msg)
 
 
@@ -54,6 +59,10 @@ def _send_confirmation_email(id, email, username, url_root, on_signup=False):
 
     msg.body = f"Hello {username},\n\nClick the following link to confirm your email: {link}"
     msg.html = render_template('emails/confirm.html', link=link, user=username, on_signup=on_signup)
+
+    if current_app.config.get("MAIL_SUPPRESS_SEND"):
+        current_app.logger.warning("MAIL_SUPPRESS_SEND enabled; confirmation link for %s: %s", email, link)
+        return
 
     mail.send(msg)
 
