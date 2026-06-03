@@ -33,6 +33,8 @@ services:
     volumes:
       # Optional: mount a PageRank file and set PAGERANK_FILE=/data/pagerank.txt in .env
       - ./data:/data:ro
+    networks:
+      - app-network
 
   celery:
     build: .
@@ -49,6 +51,8 @@ services:
     volumes:
       # Optional: scraper_graph assets / PageRank files if you have them
       - ./data:/data:ro
+    networks:
+      - app-network
 
   db:
     image: mysql:8.0
@@ -65,13 +69,25 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      app-network:
+        aliases:
+          - db
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
     volumes:
       - redis-data:/data
+    networks:
+      app-network:
+        aliases:
+          - redis
 
 volumes:
   mysql-data:
   redis-data:
+
+networks:
+  app-network:
+    driver: bridge
